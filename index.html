@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AF4EU PAs Translation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .language-tab {
+            transition: all 0.3s ease;
+        }
+        .language-tab:hover {
+            transform: translateY(-2px);
+        }
+        .char-counter {
+            transition: color 0.3s;
+        }
+        textarea {
+            resize: none;
+        }
+        .copy-btn {
+            transition: all 0.2s ease;
+        }
+        .copy-btn:hover {
+            transform: scale(1.05);
+        }
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-blue-800 mb-2">AF4EU PAs Translation</h1>
+            <p class="text-gray-600">Translate protected area information across 9 European languages</p>
+        </div>
+
+        <!-- API Key Input -->
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8 p-6">
+            <div class="mb-4">
+                <label for="apiKey" class="block text-lg font-medium text-gray-700 mb-2">Azure Translator API Key</label>
+                <input type="password" id="apiKey" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your Azure Translator API key">
+                <div class="mt-2">
+                    <label for="region" class="block text-lg font-medium text-gray-700 mb-2">Azure Region</label>
+                    <input type="text" id="region" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter your Azure region (e.g., northeurope)">
+                </div>
+                <p class="text-sm text-gray-500 mt-1">Your API key and region are used only in your browser and not stored anywhere.</p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+            <div class="p-6">
+                <div class="mb-6">
+                    <label for="englishText" class="block text-lg font-medium text-gray-700 mb-2">English Text (Original)</label>
+                    <div class="relative">
+                        <textarea id="englishText" rows="6" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Enter text to translate..." maxlength="2250"></textarea>
+                        <div class="absolute bottom-2 right-2 text-sm text-gray-500">
+                            <span id="charCount">0</span>/2250
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-semibold text-gray-800">Translations</h2>
+                    <button id="translateAllBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center">
+                        <i class="fas fa-language mr-2"></i> Translate All
+                    </button>
+                </div>
+
+                <div class="mb-4 overflow-x-auto">
+                    <div class="flex space-x-1">
+                        <button data-lang="it" class="language-tab px-4 py-2 rounded-t-lg bg-gray-200 hover:bg-gray-300 font-medium text-gray-700">Italian</button>
+                        <button data-lang="es" class="language-tab px-4 py-2 rounded-t-lg bg-gray-200 hover:bg-gray-300 font-medium text-gray-700">Spanish</button>
+                        <button data-lang="el" class="language-tab px-4 py-2 rounded-t-lg bg-gray-200 hover:bg-gray-300 font-medium text-gray-700">Greek</button>
+                        <button data-lang="fr" class="language-tab px-4 py-2 rounded-t-lg bg-gray-200 hover:bg-gray-300 font-medium text-gray-700">French</button>
+                        <button data-lang="nl" class="language-tab px-4 py-2 rounded-t-lg bg-gray-200 hover:bg-gray-300 font-medium text-gray-700">Flemish</button>
+                        <button data-lang="de" class="language-tab px-4 py-2 rounded-t-lg bg-gray-200 hover:bg-gray-300 font-medium text-gray-700">German</button>
+                        <button data-lang="sk" class="language-tab px-4 py-2 rounded-t-lg bg-gray-200 hover:bg-gray-300 font-medium text-gray-700">Slovak</button>
+                        <button data-lang="fi" class="language-tab px-4 py-2 rounded-t-lg bg-gray-200 hover:bg-gray-300 font-medium text-gray-700">Finnish</button>
+                        <button data-lang="pt" class="language-tab px-4 py-2 rounded-t-lg bg-gray-200 hover:bg-gray-300 font-medium text-gray-700">Portuguese</button>
+                    </div>
+                </div>
+
+                <div id="translationContainer" class="border border-gray-300 rounded-b-lg rounded-tr-lg p-4 min-h-64 bg-gray-50">
+                    <div class="text-center text-gray-500 py-16">
+                        <i class="fas fa-language text-4xl mb-3 text-blue-200"></i>
+                        <p>Select a language to view translation</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-blue-700 mb-2">Italian</h3>
+                <div class="relative">
+                    <textarea id="itText" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" readonly></textarea>
+                    <button data-target="itText" class="copy-btn absolute top-2 right-2 bg-gray-100 hover:bg-gray-200 p-1 rounded text-gray-700">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-blue-700 mb-2">Spanish</h3>
+                <div class="relative">
+                    <textarea id="esText" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" readonly></textarea>
+                    <button data-target="esText" class="copy-btn absolute top-2 right-2 bg-gray-100 hover:bg-gray-200 p-1 rounded text-gray-700">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-blue-700 mb-2">Greek</h3>
+                <div class="relative">
+                    <textarea id="elText" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" readonly></textarea>
+                    <button data-target="elText" class="copy-btn absolute top-2 right-2 bg-gray-100 hover:bg-gray-200 p-1 rounded text-gray-700">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-blue-700 mb-2">French</h3>
+                <div class="relative">
+                    <textarea id="frText" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" readonly></textarea>
+                    <button data-target="frText" class="copy-btn absolute top-2 right-2 bg-gray-100 hover:bg-gray-200 p-1 rounded text-gray-700">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-blue-700 mb-2">Flemish</h3>
+                <div class="relative">
+                    <textarea id="nlText" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" readonly></textarea>
+                    <button data-target="nlText" class="copy-btn absolute top-2 right-2 bg-gray-100 hover:bg-gray-200 p-1 rounded text-gray-700">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-blue-700 mb-2">German</h3>
+                <div class="relative">
+                    <textarea id="deText" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" readonly></textarea>
+                    <button data-target="deText" class="copy-btn absolute top-2 right-2 bg-gray-100 hover:bg-gray-200 p-1 rounded text-gray-700">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-blue-700 mb-2">Slovak</h3>
+                <div class="relative">
+                    <textarea id="skText" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" readonly></textarea>
+                    <button data-target="skText" class="copy-btn absolute top-2 right-2 bg-gray-100 hover:bg-gray-200 p-1 rounded text-gray-700">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-blue-700 mb-2">Finnish</h3>
+                <div class="relative">
+                    <textarea id="fiText" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" readonly></textarea>
+                    <button data-target="fiText" class="copy-btn absolute top-2 right-2 bg-gray-100 hover:bg-gray-200 p-1 rounded text-gray-700">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <h3 class="font-bold text-blue-700 mb-2">Portuguese</h3>
+                <div class="relative">
+                    <textarea id="ptText" rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg mb-2" readonly></textarea>
+                    <button data-target="ptText" class="copy-btn absolute top-2 right-2 bg-gray-100 hover:bg-gray-200 p-1 rounded text-gray-700">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const englishText = document.getElementById('englishText');
+            const charCount = document.getElementById('charCount');
+            const translateAllBtn = document.getElementById('translateAllBtn');
+            const languageTabs = document.querySelectorAll('.language-tab');
+            const translationContainer = document.getElementById('translationContainer');
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            const apiKeyInput = document.getElementById('apiKey');
+            const regionInput = document.getElementById('region');
+            
+            // Character counter
+            englishText.addEventListener('input', function() {
+                const count = this.value.length;
+                charCount.textContent = count;
+                
+                if (count > 2000) {
+                    charCount.classList.add('text-red-500');
+                    charCount.classList.remove('text-gray-500');
+                } else {
+                    charCount.classList.remove('text-red-500');
+                    charCount.classList.add('text-gray-500');
+                }
+            });
+            
+            // Language tab click handler
+            languageTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    showTranslation(lang);
+                });
+            });
+            
+            // Translate all button
+            translateAllBtn.addEventListener('click', async function() {
+                if (!englishText.value.trim()) {
+                    alert('Please enter text to translate');
+                    return;
+                }
+                
+                const apiKey = apiKeyInput.value.trim();
+                if (!apiKey) {
+                    alert('Please enter your Azure Translator API key');
+                    return;
+                }
+                
+                const region = regionInput.value.trim();
+                if (!region) {
+                    alert('Please enter your Azure region');
+                    return;
+                }
+                
+                // Show loading state
+                const originalText = translateAllBtn.innerHTML;
+                translateAllBtn.disabled = true;
+                translateAllBtn.innerHTML = '<i class="fas fa-spinner spinner mr-2"></i> Translating...';
+                
+                try {
+                    // Translate to all languages
+                    await translateToAllLanguages(englishText.value, apiKey, region);
+                    
+                    // Show first translation in the preview area
+                    showTranslation('it');
+                } catch (error) {
+                    console.error('Translation error:', error);
+                    alert('Translation failed: ' + error.message);
+                } finally {
+                    // Restore button state
+                    translateAllBtn.innerHTML = originalText;
+                    translateAllBtn.disabled = false;
+                }
+            });
+            
+            // Copy buttons
+            copyButtons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const textarea = document.getElementById(targetId);
+                    textarea.select();
+                    document.execCommand('copy');
+                    
+                    // Show feedback
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i>';
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 1000);
+                });
+            });
+            
+            function showTranslation(lang) {
+                if (!englishText.value.trim()) {
+                    alert('Please enter text first');
+                    return;
+                }
+                
+                const translatedText = document.getElementById(`${lang}Text`).value;
+                
+                if (!translatedText) {
+                    translationContainer.innerHTML = `
+                        <div class="text-center text-gray-500 py-16">
+                            <i class="fas fa-exclamation-triangle text-4xl mb-3 text-yellow-400"></i>
+                            <p>No translation available yet. Click "Translate All" first.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                translationContainer.innerHTML = `
+                    <div class="mb-4">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">English</h3>
+                        <div class="bg-white p-3 rounded border border-gray-200 mb-4">${englishText.value}</div>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">${getLanguageName(lang)}</h3>
+                        <div class="bg-white p-3 rounded border border-gray-200">${translatedText}</div>
+                    </div>
+                `;
+            }
+            
+            function getLanguageName(code) {
+                const names = {
+                    it: 'Italian',
+                    es: 'Spanish',
+                    el: 'Greek',
+                    fr: 'French',
+                    nl: 'Flemish',
+                    de: 'German',
+                    sk: 'Slovak',
+                    fi: 'Finnish',
+                    pt: 'Portuguese'
+                };
+                return names[code] || code;
+            }
+            
+            async function translateToAllLanguages(text, apiKey, region) {
+                const languages = [
+                    { code: 'it', name: 'Italian' },
+                    { code: 'es', name: 'Spanish' },
+                    { code: 'el', name: 'Greek' },
+                    { code: 'fr', name: 'French' },
+                    { code: 'nl', name: 'Dutch' }, // Flemish is Dutch
+                    { code: 'de', name: 'German' },
+                    { code: 'sk', name: 'Slovak' },
+                    { code: 'fi', name: 'Finnish' },
+                    { code: 'pt', name: 'Portuguese' }
+                ];
+                
+                // Create an array of translation promises
+                const translationPromises = languages.map(async (lang) => {
+                    try {
+                        const translatedText = await translateWithAzure(text, lang.code, apiKey, region);
+                        document.getElementById(`${lang.code}Text`).value = translatedText;
+                    } catch (error) {
+                        console.error(`Error translating to ${lang.name}:`, error);
+                        document.getElementById(`${lang.code}Text`).value = `[Translation Error: ${error.message}]`;
+                    }
+                });
+                
+                // Wait for all translations to complete
+                await Promise.all(translationPromises);
+            }
+            
+            async function translateWithAzure(text, targetLang, apiKey, region) {
+                const url = `https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&to=${targetLang}`;
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Ocp-Apim-Subscription-Key': apiKey,
+                        'Ocp-Apim-Subscription-Region': region
+                    },
+                    body: JSON.stringify([{
+                        'text': text
+                    }])
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error?.message || 'Azure Translator API error');
+                }
+                
+                const data = await response.json();
+                return data[0].translations[0].text;
+            }
+        });
+    </script>
+</body>
+</html>
